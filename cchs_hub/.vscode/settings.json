@@ -1,0 +1,6 @@
+{
+    "discord.removeRemoteRepository": true,
+    "discord.lowerDetailsNoWorkspaceFound": "{empty}",
+    "discord.removeLowerDetails": false,
+    "discord.removeDetails": true
+}

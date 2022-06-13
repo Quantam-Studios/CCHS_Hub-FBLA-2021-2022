@@ -1,0 +1,620 @@
+// General Packages
+import 'package:flutter/material.dart';
+// Popups
+import 'package:rflutter_alert/rflutter_alert.dart';
+// Network Interfacing
+import 'dart:io';
+// Models
+import 'package:cchs_hub/model/user.dart';
+// Hive DataBase
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:cchs_hub/boxes.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  HomePageContent createState() => HomePageContent();
+}
+
+// Get user's User() class
+User userInfo = Boxes.getUsers().getAt(0)!;
+
+class HomePageContent extends State {
+  var scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: scaffoldKey,
+      drawerEnableOpenDragGesture: false,
+      drawer: Drawer(
+        child: _optionsMenu(context, userInfo),
+        backgroundColor: const Color(0xFF222222),
+      ),
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              const Color(0xFF5C9BED),
+              Colors.blue.shade600,
+              Colors.blue.shade600,
+            ],
+          )),
+          child: Column(
+            children: [
+              _topSection(scaffoldKey, context),
+              // main section
+              _mainSection(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// TOP SECTION
+_topSection(GlobalKey<ScaffoldState> scaffoldKey, BuildContext context) {
+  return Container(
+    padding: const EdgeInsets.all(10.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // OPTIONS MENU BUTTON
+        IconButton(
+          onPressed: () => scaffoldKey.currentState!.openDrawer(),
+          icon: const Icon(
+            Icons.notes_rounded,
+            color: Colors.white,
+            size: 35,
+          ),
+        ),
+        // WELCOME / NAME SECTION
+        Container(
+          margin:
+              const EdgeInsets.only(top: 0, bottom: 20, left: 20, right: 20),
+          child: Column(
+            children: [
+              const Center(
+                child: Text(
+                  "Good Morning",
+                  style: TextStyle(
+                    fontSize: 28,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Center(
+                child: buildUser(context, userInfo),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+// OPTIONS MENU
+_optionsMenu(BuildContext context, User userInfo) {
+  return SafeArea(
+    child: ListView(
+      // Important: Remove any padding from the ListView.
+      padding: EdgeInsets.zero,
+      children: [
+        ListTile(
+          title: Row(
+            children: const [
+              Icon(
+                Icons.account_circle_rounded,
+                color: Colors.white,
+              ),
+              Text(' Name'),
+            ],
+          ),
+          onTap: () {
+            // Make pop up appear
+            _editNamePopUp(context, userInfo);
+          },
+        ),
+        ListTile(
+          title: Row(
+            children: const [
+              Icon(
+                Icons.bug_report_rounded,
+                color: Colors.white,
+              ),
+              Text(' Report Issues'),
+            ],
+          ),
+          onTap: () {
+            // Make pop up appear
+            _reportIssuePopUp(context);
+          },
+        ),
+        ListTile(
+          title: Row(
+            children: const [
+              Icon(
+                Icons.lightbulb_rounded,
+                color: Colors.white,
+              ),
+              Text(' Suggest Ideas'),
+            ],
+          ),
+          onTap: () {
+            // Make pop up appear
+            _suggestIdeaPopUp(context);
+          },
+        ),
+      ],
+    ),
+  );
+}
+
+// CHECK USER CONNECTION
+// determines if the user is connected to the internet
+bool activeConnection = false;
+Future checkUserConnection() async {
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      activeConnection = true;
+    }
+  } on SocketException catch (_) {
+    activeConnection = false;
+  }
+  return activeConnection;
+}
+
+// BUILD USER
+// This returns a text widget
+Widget buildUser(BuildContext context, User userInfo) {
+  // this text is what displays the users name
+  return Text(
+    // User Name
+    userInfo.name,
+    style: const TextStyle(
+      fontSize: 30,
+      fontWeight: FontWeight.bold,
+    ),
+    textAlign: TextAlign.center,
+  );
+}
+
+// Edit Name Controller
+final editNameController = TextEditingController(text: '');
+// EDIT NAME
+_editNamePopUp(BuildContext context, User userInfo) {
+// EDIT NAME POPUP
+// this displays when the user has selected to edit the name from the drawer menu
+// initialize controller
+  editNameController.text = '';
+  // Actual pop up object
+  Alert(
+    style: const AlertStyle(
+      backgroundColor: Color(0xff3b3b3b),
+      titleStyle: TextStyle(color: Colors.white),
+    ),
+    context: context,
+    title: "Edit Name",
+    content: Column(
+      children: <Widget>[
+        // edit name input field
+        TextField(
+          controller: editNameController,
+          style: const TextStyle(
+            color: Colors.white,
+          ),
+          decoration: const InputDecoration(
+            icon: Icon(
+              Icons.account_circle_rounded,
+              color: Colors.white,
+            ),
+            labelText: '',
+            labelStyle: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+    ),
+    // Confirm button
+    buttons: [
+      DialogButton(
+        onPressed: () => {
+          // get rid of pop up
+          Navigator.pop(context),
+          if (editNameController.text != "")
+            {
+              // save the name to the device
+              editUser(userInfo, editNameController.text),
+            },
+          // display edit made snackbar
+          _changedName(context),
+        },
+        child: const Text(
+          "Set Name",
+          style: TextStyle(color: Colors.white, fontSize: 15),
+        ),
+      ),
+    ],
+  ).show();
+}
+
+// EDIT USER (HIVE)
+// this makes the changes that are chosen in the _editNamePopUp() method
+void editUser(
+  User userInfo,
+  String name,
+) {
+  userInfo.name = name;
+  // Update values of the existing user
+  userInfo.save();
+}
+
+// CHANGED NAME SNACKBAR
+// this snackbar will be displayed when a user changes their name
+_changedName(BuildContext context) {
+  // Varying Variables
+  String message;
+  Color color;
+  if (editNameController.text != "") {
+    message = "Name Updated!";
+    color = Colors.greenAccent.shade700;
+  } else {
+    message = "You can't have a blank name.";
+    color = Colors.redAccent;
+  }
+  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(
+      message,
+      textAlign: TextAlign.center,
+      style: const TextStyle(fontSize: 16.0),
+    ),
+    backgroundColor: color,
+    behavior: SnackBarBehavior.floating,
+    margin: const EdgeInsets.only(left: 45, right: 45, bottom: 15, top: 15),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(23.0)),
+  ));
+}
+
+// Bug Report Controller
+final bugReportController = TextEditingController(text: '');
+// REPORT ISSUES
+_reportIssuePopUp(BuildContext context) {
+// REPORT ISSUES POPUP
+// this displays when the user has selected to report an issue from the drawer menu
+// initialize controller
+  bugReportController.text = '';
+  // Actual pop up object
+  Alert(
+      style: const AlertStyle(
+        backgroundColor: Color(0xff3b3b3b),
+        titleStyle: TextStyle(color: Colors.white),
+      ),
+      context: context,
+      title: "Report an Issue",
+      content: Column(
+        children: <Widget>[
+          // Guidance
+          const Text(
+            "Try to include information such as the page it occurred on, and how it can be recreated.",
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          // bug report input field
+          TextField(
+            controller: bugReportController,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+            decoration: const InputDecoration(
+              icon: Icon(
+                Icons.bug_report_rounded,
+                color: Colors.white,
+              ),
+              labelText: '',
+              labelStyle: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+      // Confirm button
+      buttons: [
+        DialogButton(
+          onPressed: () => {
+            // get rid of pop up
+            Navigator.pop(context),
+            // display sent snackbar
+            _bugReportSent(context)
+          },
+          child: const Text(
+            "Report",
+            style: TextStyle(color: Colors.white, fontSize: 15),
+          ),
+        )
+      ]).show();
+}
+
+// BUG REPORT SENT SNACKBAR
+// this snackbar will be displayed when a user submits a bug report
+_bugReportSent(BuildContext context) {
+  // Varying Variables
+  String message;
+  Color color;
+  // Check Connection
+  checkUserConnection();
+  if (activeConnection) {
+    message = "Sent, thanks for informing us!";
+    color = Colors.greenAccent.shade700;
+  } else {
+    message = "You are currently disconnected.";
+    color = Colors.redAccent;
+  }
+  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(
+      message,
+      textAlign: TextAlign.center,
+      style: const TextStyle(fontSize: 16.0),
+    ),
+    backgroundColor: color,
+    behavior: SnackBarBehavior.floating,
+    margin: const EdgeInsets.only(left: 45, right: 45, bottom: 15, top: 15),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(23.0)),
+  ));
+}
+
+// Suggest an Idea Controller
+final suggestionController = TextEditingController(text: '');
+// SUGGEST IDEAS
+_suggestIdeaPopUp(BuildContext context) {
+// SUGGEST IDEAS POPUP
+// this displays when the user has selected to suggest an idea from the drawer menu
+// initialize controller
+  suggestionController.text = '';
+  // Actual pop up object
+  Alert(
+      style: const AlertStyle(
+        backgroundColor: Color(0xff3b3b3b),
+        titleStyle: TextStyle(color: Colors.white),
+      ),
+      context: context,
+      title: "Suggest an Idea",
+      content: Column(
+        children: <Widget>[
+          // Guidance
+          const Text(
+            "Tell us about your idea and why you would find it useful.",
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          // idea suggestion input field
+          TextField(
+            controller: suggestionController,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+            decoration: const InputDecoration(
+              icon: Icon(
+                Icons.lightbulb_rounded,
+                color: Colors.white,
+              ),
+              labelText: '',
+              labelStyle: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+      // Confirm button
+      buttons: [
+        DialogButton(
+          onPressed: () => {
+            // get rid of pop up
+            Navigator.pop(context),
+            // display sent snackbar
+            _ideaSent(context)
+          },
+          child: const Text(
+            "Suggest",
+            style: TextStyle(color: Colors.white, fontSize: 15),
+          ),
+        )
+      ]).show();
+}
+
+// SUGGESTION/IDEA SENT SNACKBAR
+// this snackbar will be displayed when a user submits a suggestion/idea
+_ideaSent(BuildContext context) {
+  // Varying Variables
+  String message;
+  Color color;
+  // Check Connection
+  checkUserConnection();
+  if (activeConnection) {
+    message = "Sent, thanks for the idea!";
+    color = Colors.greenAccent.shade700;
+  } else {
+    message = "You are currently disconnected.";
+    color = Colors.redAccent;
+  }
+  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(
+      message,
+      textAlign: TextAlign.center,
+      style: const TextStyle(fontSize: 16.0),
+    ),
+    backgroundColor: color,
+    behavior: SnackBarBehavior.floating,
+    margin: const EdgeInsets.only(left: 45, right: 45, bottom: 15, top: 15),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(23.0)),
+  ));
+}
+
+// CURRENT CLASS
+// this contains, and styles the container showing the current class, time, and room
+_currentClassInfo() {
+  return Container(
+    margin: const EdgeInsets.only(
+      right: 15.0,
+      left: 15.0,
+      top: 15.0,
+    ),
+    padding: const EdgeInsets.all(10.0),
+    decoration: BoxDecoration(
+      color: Colors.blue,
+      gradient: const LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: [
+          Colors.blue,
+          Color(0xFF5C9BED),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(15.0),
+    ),
+    child: Center(
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.access_time_rounded,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      '7:30-8:20(am)',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white.withAlpha(200),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    'AP Biology',
+                    style: TextStyle(
+                      fontSize: 22,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.meeting_room_outlined,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      'D203',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white.withAlpha(200),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+_mainSection() {
+  return Expanded(
+    child: Container(
+      padding: const EdgeInsets.all(5.0),
+      decoration: const BoxDecoration(
+        color: Color(0xFF121212),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25.0),
+          topRight: Radius.circular(25.0),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black,
+            offset: Offset(0.0, 0.0),
+            blurRadius: 30.0,
+            spreadRadius: 0.0,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _currentClassInfo(),
+          _lunchForTheDay(),
+        ],
+      ),
+    ),
+  );
+}
+
+// LUNCH FOR THE CURRENT DAY CONTAINER
+_lunchForTheDay() {
+  return Container(
+    margin:
+        const EdgeInsets.only(top: 20.0, bottom: 0, left: 15.0, right: 15.0),
+    padding: const EdgeInsets.all(10.0),
+    decoration: BoxDecoration(
+      color: const Color(0xFF333333),
+      borderRadius: BorderRadius.circular(15.0),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Top Bar
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: const [
+              // TITLE
+              Text(
+                "Today's Lunch",
+                style: TextStyle(fontSize: 23),
+              ),
+              Spacer(),
+              // TIME
+              Text(
+                "11:30-12:00",
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              )
+            ],
+          ),
+        ),
+        // LUNCH ITEMS
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            "Pizza, fruit cup, breadsticks, milk",
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
