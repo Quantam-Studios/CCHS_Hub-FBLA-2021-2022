@@ -1,4 +1,5 @@
 // General Packages
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // Popups
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -95,7 +96,14 @@ _topSection(GlobalKey<ScaffoldState> scaffoldKey, BuildContext context) {
                 ),
               ),
               Center(
-                child: buildUser(context, userInfo),
+                // child: buildUser(context, userInfo),
+                child: ValueListenableBuilder<Box<User>>(
+                  valueListenable: Boxes.getUsers().listenable(),
+                  builder: (context, box, _) {
+                    final newUser = box.getAt(0)!;
+                    return buildUser(context, newUser);
+                  },
+                ),
               ),
             ],
           ),
@@ -183,7 +191,7 @@ Widget buildUser(BuildContext context, User userInfo) {
   // this text is what displays the users name
   return Text(
     // User Name
-    userInfo.name,
+    Boxes.getUsers().getAt(0)!.name,
     style: const TextStyle(
       fontSize: 30,
       fontWeight: FontWeight.bold,

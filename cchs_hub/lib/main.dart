@@ -19,9 +19,6 @@ Future main() async {
   // Check if it's the first run or if the user has not finished setting it up
   if (Boxes.getUsers().getAt(0) == null) {
     addUser("Set name in settings");
-  } else {
-    Boxes.getUsers().getAt(0)!.delete();
-    addUser("Set name in settings");
   }
 
   runApp(const MyApp());
