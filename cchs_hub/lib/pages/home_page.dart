@@ -1,5 +1,4 @@
 // General Packages
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // Popups
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -96,7 +95,6 @@ _topSection(GlobalKey<ScaffoldState> scaffoldKey, BuildContext context) {
                 ),
               ),
               Center(
-                // child: buildUser(context, userInfo),
                 child: ValueListenableBuilder<Box<User>>(
                   valueListenable: Boxes.getUsers().listenable(),
                   builder: (context, box, _) {
@@ -168,21 +166,6 @@ _optionsMenu(BuildContext context, User userInfo) {
       ],
     ),
   );
-}
-
-// CHECK USER CONNECTION
-// determines if the user is connected to the internet
-bool activeConnection = false;
-Future checkUserConnection() async {
-  try {
-    final result = await InternetAddress.lookup('google.com');
-    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-      activeConnection = true;
-    }
-  } on SocketException catch (_) {
-    activeConnection = false;
-  }
-  return activeConnection;
 }
 
 // BUILD USER
@@ -354,30 +337,38 @@ _reportIssuePopUp(BuildContext context) {
 
 // BUG REPORT SENT SNACKBAR
 // this snackbar will be displayed when a user submits a bug report
-_bugReportSent(BuildContext context) {
+Future _bugReportSent(BuildContext context) async {
   // Varying Variables
-  String message;
-  Color color;
+  String message = "";
+  Color color = Colors.transparent;
   // Check Connection
-  checkUserConnection();
-  if (activeConnection) {
-    message = "Sent, thanks for informing us!";
-    color = Colors.greenAccent.shade700;
-  } else {
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    // connected
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      message = "Sent, thanks for informing us!";
+      color = Colors.greenAccent.shade700;
+    }
+    // disconnected
+  } on SocketException catch (_) {
     message = "You are currently disconnected.";
     color = Colors.redAccent;
   }
-  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    content: Text(
-      message,
-      textAlign: TextAlign.center,
-      style: const TextStyle(fontSize: 16.0),
+
+  // Return the newly made snackbar values in a snackbar.
+  return ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 16.0),
+      ),
+      backgroundColor: color,
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.only(left: 45, right: 45, bottom: 15, top: 15),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(23.0)),
     ),
-    backgroundColor: color,
-    behavior: SnackBarBehavior.floating,
-    margin: const EdgeInsets.only(left: 45, right: 45, bottom: 15, top: 15),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(23.0)),
-  ));
+  );
 }
 
 // Suggest an Idea Controller
@@ -439,19 +430,25 @@ _suggestIdeaPopUp(BuildContext context) {
 
 // SUGGESTION/IDEA SENT SNACKBAR
 // this snackbar will be displayed when a user submits a suggestion/idea
-_ideaSent(BuildContext context) {
+Future _ideaSent(BuildContext context) async {
   // Varying Variables
-  String message;
-  Color color;
+  String message = "";
+  Color color = Colors.transparent;
   // Check Connection
-  checkUserConnection();
-  if (activeConnection) {
-    message = "Sent, thanks for the idea!";
-    color = Colors.greenAccent.shade700;
-  } else {
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    // connected
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      message = "Sent, thanks for the idea!";
+      color = Colors.greenAccent.shade700;
+    }
+    // disconnected
+  } on SocketException catch (_) {
     message = "You are currently disconnected.";
     color = Colors.redAccent;
   }
+
+  // Return the newly made snackbar values in a snackbar.
   return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text(
       message,

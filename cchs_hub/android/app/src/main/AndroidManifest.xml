@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.cchs_hub">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="cchs_hub"
         android:name="${applicationName}"

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // Pages
 import 'pages/home_page.dart';
+import 'pages/socials_page.dart';
 // Hive Database
 import 'package:hive_flutter/hive_flutter.dart';
 import 'boxes.dart';
@@ -17,24 +18,11 @@ Future main() async {
   await Hive.openBox<User>('users');
 
   // Check if it's the first run or if the user has not finished setting it up
-  if (Boxes.getUsers().getAt(0) == null) {
+  if (Boxes.getUsers().length == 0) {
     addUser("Set name in settings");
   }
 
   runApp(const MyApp());
-}
-
-// ADD USER (HIVE)
-// this function saves the newly created user to the systems local storage with hive
-Future addUser(String name) async {
-  // Create User() object
-  final newUser = User()..name = name;
-
-  // Transfer object types to hive readable
-  // Add new event
-  // Save to local storage
-  final box = Boxes.getUsers();
-  box.add(newUser);
 }
 
 class MyApp extends StatelessWidget {
@@ -92,13 +80,13 @@ class _PageState extends State<Page> {
     // PAGE REFERENCES
     List<Widget> _pages = <Widget>[
       // HOME
-      HomePage(),
+      const HomePage(),
       // PLANNER
-      HomePage(),
+      const HomePage(),
       // CLASSES
-      HomePage(),
+      const HomePage(),
       // SOCIALS
-      HomePage(),
+      SocialPage(),
     ];
 
     return Scaffold(
@@ -163,4 +151,18 @@ class _PageState extends State<Page> {
       _selectedIndex = index;
     });
   }
+}
+
+// ADD USER (HIVE)
+// this function saves the newly created user to the systems local storage with hive
+// this function should only be called once per device.
+Future addUser(String name) async {
+  // Create User() object
+  final newUser = User()..name = name;
+
+  // Transfer object types to hive readable
+  // Add new event
+  // Save to local storage
+  final box = Boxes.getUsers();
+  box.add(newUser);
 }

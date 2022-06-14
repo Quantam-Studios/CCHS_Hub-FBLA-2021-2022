@@ -35,6 +35,10 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  # Font Awesome for more icons
+  font_awesome_flutter:
+  # Webview for viewing the social media pages
+  webview_flutter:
   # hive database
   # this stuff is what allows for saving user info locally.
   hive: ^2.0.3
