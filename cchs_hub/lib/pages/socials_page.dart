@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cchs_hub/web_view_container.dart';
+import 'package:cchs_hub/helper_scripts/web_view_container.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SocialPage extends StatelessWidget {

@@ -1,14 +1,19 @@
 // General Packages
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:cchs_hub/pages/classes_page.dart';
 // Popups
 import 'package:rflutter_alert/rflutter_alert.dart';
+// Time Management
+import 'package:cchs_hub/helper_scripts/time_management.dart';
 // Network Interfacing
 import 'dart:io';
 // Models
 import 'package:cchs_hub/model/user.dart';
+import 'package:cchs_hub/model/class.dart';
 // Hive DataBase
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:cchs_hub/boxes.dart';
+import 'package:cchs_hub/helper_scripts/boxes.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -25,7 +30,14 @@ class HomePageContent extends State {
 
   @override
   void initState() {
+    updateActiveClass();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // Get rid of boxes needed for this page
+    super.dispose();
   }
 
   @override
@@ -85,10 +97,10 @@ _topSection(GlobalKey<ScaffoldState> scaffoldKey, BuildContext context) {
               const EdgeInsets.only(top: 0, bottom: 20, left: 20, right: 20),
           child: Column(
             children: [
-              const Center(
+              Center(
                 child: Text(
-                  "Good Morning",
-                  style: TextStyle(
+                  getGreetingText(),
+                  style: const TextStyle(
                     fontSize: 28,
                   ),
                   textAlign: TextAlign.center,
@@ -111,6 +123,19 @@ _topSection(GlobalKey<ScaffoldState> scaffoldKey, BuildContext context) {
   );
 }
 
+// GREETING TEXT DETERMINANCE
+// this holds the active greeting text
+getGreetingText() {
+  String activeGreetingText = '';
+  for (int i = 0; i < greetingTimes.length; i++) {
+    int status = activeTimeUpdateCheck(greetingTimes[i]);
+    if (status >= 0) {
+      activeGreetingText = greetingStrings[i];
+    }
+  }
+  return activeGreetingText;
+}
+
 // OPTIONS MENU
 _optionsMenu(BuildContext context, User userInfo) {
   return SafeArea(
@@ -118,6 +143,26 @@ _optionsMenu(BuildContext context, User userInfo) {
       // Important: Remove any padding from the ListView.
       padding: EdgeInsets.zero,
       children: [
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: const [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Options",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Divider(
+                color: Colors.grey,
+              ),
+            ],
+          ),
+        ),
         ListTile(
           title: Row(
             children: const [
@@ -125,7 +170,10 @@ _optionsMenu(BuildContext context, User userInfo) {
                 Icons.account_circle_rounded,
                 color: Colors.white,
               ),
-              Text(' Name'),
+              Text(
+                ' Name',
+                style: TextStyle(fontSize: 16),
+              ),
             ],
           ),
           onTap: () {
@@ -140,7 +188,10 @@ _optionsMenu(BuildContext context, User userInfo) {
                 Icons.bug_report_rounded,
                 color: Colors.white,
               ),
-              Text(' Report Issues'),
+              Text(
+                ' Report Issues',
+                style: TextStyle(fontSize: 16),
+              ),
             ],
           ),
           onTap: () {
@@ -155,7 +206,10 @@ _optionsMenu(BuildContext context, User userInfo) {
                 Icons.lightbulb_rounded,
                 color: Colors.white,
               ),
-              Text(' Suggest Ideas'),
+              Text(
+                ' Suggest Ideas',
+                style: TextStyle(fontSize: 16),
+              ),
             ],
           ),
           onTap: () {
@@ -462,6 +516,42 @@ Future _ideaSent(BuildContext context) async {
   ));
 }
 
+// CURRENT CLASS INFORMATION CONTAINER
+// this stores the active class index
+int activeClass = 0;
+// this is the "global" reference allowing for other functions to see the active class
+List<dynamic> allClasses = [];
+// Compare times, and update active class if needed
+updateActiveClass() {
+  allClasses = Boxes.getClasses().values.toList().cast();
+  // Only run logic if classes exist
+  activeClass = 0;
+  if (Boxes.getClasses().isNotEmpty) {
+    // determine what class should be active
+    // ensure that the school day is still happening
+    int timeStat = activeTimeUpdateCheck(endOfDay);
+    if (timeStat <= 0) {
+      // if it is determine the active class
+      for (int i = 1; activeClass < i + 1; i++) {
+        int status = activeTimeUpdateCheck(checkTimes[activeClass]);
+        if (status == 1 && activeClass != 6) {
+          activeClass += 1;
+        } else {
+          print(activeClass);
+          break;
+        }
+      }
+    }
+  } else {
+    print("VALUES NULL");
+    return;
+  }
+  print(activeClass);
+}
+
+// this contains the class object that will hold the active class info
+Class currentClass = Class();
+
 // CURRENT CLASS
 // this contains, and styles the container showing the current class, time, and room
 _currentClassInfo() {
@@ -498,7 +588,7 @@ _currentClassInfo() {
                       color: Colors.white,
                     ),
                     Text(
-                      '7:30-8:20(am)',
+                      _getActiveClassTime(),
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withAlpha(200),
@@ -507,11 +597,11 @@ _currentClassInfo() {
                   ],
                 ),
               ),
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: Text(
-                    'AP Biology',
-                    style: TextStyle(
+                    _getActiveClassName(),
+                    style: const TextStyle(
                       fontSize: 22,
                       color: Colors.white,
                     ),
@@ -527,7 +617,7 @@ _currentClassInfo() {
                       color: Colors.white,
                     ),
                     Text(
-                      'D203',
+                      _getActiveClassRoom(),
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withAlpha(200),
@@ -544,10 +634,101 @@ _currentClassInfo() {
   );
 }
 
+// GET ACTIVE CLASS INFO
+
+// the functions act to ensure the value given is never null
+// returns the active class NAME
+String _getActiveClassName() {
+  int timeStat = activeTimeUpdateCheck(endOfDay);
+  if (timeStat <= 0) {
+    // ensures the value is not null
+    if (Boxes.getClasses().isEmpty && allClasses.isEmpty) {
+      // If there are no classes then say so
+      return 'No Classes';
+    } else {
+      if (Boxes.getClasses().length < activeClass) {
+        // If the active class time doesnt match any classes then tell the user
+        return "No Class Scheduled";
+      } else {
+        // Handling early bird times
+        if (Boxes.getClasses().length < 7) {
+          // no early bird
+          return allClasses[activeClass - 1].name;
+        } else {
+          // early bird
+          return allClasses[activeClass].name;
+        }
+      }
+    }
+  } else {
+    return 'School Is Out';
+  }
+}
+
+// returns the active class TIME
+String _getActiveClassTime() {
+  int timeStat = activeTimeUpdateCheck(endOfDay);
+  if (timeStat <= 0) {
+    // ensures the value is not null
+    if (Boxes.getClasses().isEmpty && allClasses.isEmpty) {
+      // If there are no classes then say so
+      return 'No Classes';
+    } else {
+      if (Boxes.getClasses().length < activeClass) {
+        // If the active class time doesnt match any classes then tell the user
+        return "";
+      } else {
+        // Handling early bird times
+        if (Boxes.getClasses().length < 7) {
+          // no early bird
+          return allClasses[activeClass - 1].time;
+        } else {
+          // early bird
+          return allClasses[activeClass].time;
+        }
+      }
+    }
+  } else {
+    if (Boxes.getClasses().length < 7) {
+      return '3:00(pm)-8:30(am)';
+    } else {
+      return '3:00(pm)-7:30(am)';
+    }
+  }
+}
+
+// returns the active class ROOM
+String _getActiveClassRoom() {
+  int timeStat = activeTimeUpdateCheck(endOfDay);
+  if (timeStat <= 0) {
+    // ensures the value is not null
+    if (Boxes.getClasses().isEmpty && allClasses.isEmpty) {
+      // If there are no classes then say so
+      return 'No Classes';
+    } else {
+      if (Boxes.getClasses().length < activeClass) {
+        // If the active class time doesnt match any classes then tell the user
+        return "";
+      } else {
+        // Handling early bird times
+        if (Boxes.getClasses().length < 7) {
+          // no early bird
+          return allClasses[activeClass - 1].room;
+        } else {
+          // early bird
+          return allClasses[activeClass].room;
+        }
+      }
+    }
+  } else {
+    return '';
+  }
+}
+
 _mainSection() {
   return Expanded(
     child: Container(
-      padding: const EdgeInsets.all(5.0),
+      padding: const EdgeInsets.all(0.0),
       decoration: const BoxDecoration(
         color: Color(0xFF121212),
         borderRadius: BorderRadius.only(
@@ -585,7 +766,6 @@ _lunchForTheDay() {
       borderRadius: BorderRadius.circular(15.0),
     ),
     child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Top Bar
         Padding(
