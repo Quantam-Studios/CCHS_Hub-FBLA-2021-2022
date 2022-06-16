@@ -66,7 +66,7 @@ class ClassPageContent extends State {
 }
 
 // TOP SECTION
-// this has the title of thep age as well as the buttons to add and clear classes
+// this has the title of the age as well as the buttons to add and clear classes
 _topSection(BuildContext context) {
   return Container(
     decoration: BoxDecoration(

@@ -7,14 +7,18 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'pages/home_page.dart';
 import 'pages/socials_page.dart';
 import 'pages/classes_page.dart';
+import 'pages/planner_page.dart';
 // Hive Database
 import 'package:hive_flutter/hive_flutter.dart';
 import 'helper_scripts/boxes.dart';
 // Hive Models
 import 'package:cchs_hub/model/user.dart';
 import 'package:cchs_hub/model/class.dart';
+import 'package:cchs_hub/model/event.dart';
 
 Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   // Hive Initialization
   await Hive.initFlutter();
   // User
@@ -23,6 +27,9 @@ Future main() async {
   // Classes
   Hive.registerAdapter(ClassAdapter());
   await Hive.openBox<Class>('classes');
+  // Events
+  Hive.registerAdapter(EventAdapter());
+  await Hive.openBox<Event>('events');
 
   // Check if it's the first run or if the user has not finished setting it up
   if (Boxes.getUsers().length == 0) {
@@ -92,7 +99,7 @@ class _PageState extends State<Page> {
       // HOME
       const HomePage(),
       // PLANNER
-      const HomePage(),
+      const PlannerPage(),
       // CLASSES
       const ClassPage(),
       // SOCIALS

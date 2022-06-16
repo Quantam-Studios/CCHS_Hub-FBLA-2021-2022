@@ -40,10 +40,14 @@ dependencies:
   webview_flutter:
   # hive database
   # this stuff is what allows for saving user info locally.
-  hive: ^2.0.3
-  hive_flutter: ^1.0.0
+  hive: ^2.0.6
+  hive_flutter: 
   # google_nav_bar
   google_nav_bar: ^5.0.6
+  # calendar
+  table_calendar: ^3.0.3
+  # expansion card for events.
+  expansion_tile_card: ^2.0.0
   
 
 dev_dependencies:
@@ -51,8 +55,8 @@ dev_dependencies:
     sdk: flutter
 
   # hive data base generators
-  build_runner: ^1.12.2
-  hive_generator: ^1.0.1
+  build_runner: 
+  hive_generator: 
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

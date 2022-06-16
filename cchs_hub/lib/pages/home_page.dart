@@ -36,7 +36,6 @@ class HomePageContent extends State {
 
   @override
   void dispose() {
-    // Get rid of boxes needed for this page
     super.dispose();
   }
 

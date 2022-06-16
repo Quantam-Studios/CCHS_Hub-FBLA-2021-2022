@@ -8,7 +8,7 @@ class Class extends HiveObject {
   @HiveField(0)
   late String name;
 
-  // Rooom
+  // Room
   @HiveField(1)
   late String room;
 
