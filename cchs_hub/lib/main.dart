@@ -55,8 +55,20 @@ class MyApp extends StatelessWidget {
           bodyText1: TextStyle(color: Colors.white),
           bodyText2: TextStyle(color: Colors.white),
           headline1: TextStyle(color: Colors.white),
+          headline2: TextStyle(color: Colors.white),
         ),
         splashColor: Colors.blue,
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF353535), width: 1.0),
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+          ),
+          labelStyle: TextStyle(color: Colors.white),
+          prefixIconColor: Colors.white,
+        ),
       ),
       home: const Page(),
     );
