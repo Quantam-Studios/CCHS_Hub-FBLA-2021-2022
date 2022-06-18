@@ -69,6 +69,7 @@ class MyApp extends StatelessWidget {
           labelStyle: TextStyle(color: Colors.white),
           prefixIconColor: Colors.white,
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       home: const Page(),
     );

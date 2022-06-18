@@ -149,7 +149,7 @@ Widget buildClasses(List<Class> allClasses) {
             TextSpan(children: <TextSpan>[
               TextSpan(text: "Press "),
               TextSpan(text: "add", style: TextStyle(color: Colors.blue)),
-              TextSpan(text: " to create a class.")
+              TextSpan(text: " to add a class.")
             ]),
             style: TextStyle(color: Colors.grey, fontSize: 18),
           ),

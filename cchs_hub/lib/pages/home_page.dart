@@ -86,7 +86,6 @@ _topSection(GlobalKey<ScaffoldState> scaffoldKey, BuildContext context) {
           onPressed: () => scaffoldKey.currentState!.openDrawer(),
           icon: const Icon(
             Icons.notes_rounded,
-            color: Colors.white,
             size: 35,
           ),
         ),
@@ -167,7 +166,6 @@ _optionsMenu(BuildContext context, User userInfo) {
             children: const [
               Icon(
                 Icons.account_circle_rounded,
-                color: Colors.white,
               ),
               Text(
                 ' Name',
@@ -185,7 +183,6 @@ _optionsMenu(BuildContext context, User userInfo) {
             children: const [
               Icon(
                 Icons.bug_report_rounded,
-                color: Colors.white,
               ),
               Text(
                 ' Report Issues',
@@ -203,7 +200,6 @@ _optionsMenu(BuildContext context, User userInfo) {
             children: const [
               Icon(
                 Icons.lightbulb_rounded,
-                color: Colors.white,
               ),
               Text(
                 ' Suggest Ideas',
@@ -411,6 +407,7 @@ Future _bugReportSent(BuildContext context) async {
   // Return the newly made snackbar values in a snackbar.
   return ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
+      duration: const Duration(seconds: 2),
       content: Text(
         message,
         textAlign: TextAlign.center,
@@ -503,6 +500,7 @@ Future _ideaSent(BuildContext context) async {
 
   // Return the newly made snackbar values in a snackbar.
   return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    duration: const Duration(seconds: 2),
     content: Text(
       message,
       textAlign: TextAlign.center,
