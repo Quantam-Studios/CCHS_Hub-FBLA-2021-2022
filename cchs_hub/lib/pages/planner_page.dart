@@ -32,7 +32,7 @@ class PlannerPageContent extends State<PlannerPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const AddEventPage(),
+              builder: (context) => EventPage(),
             ),
           )
         },
@@ -180,7 +180,7 @@ Widget buildEvent(BuildContext context, Event eventInfo, int index) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EditEventPage(eventInfo),
+            builder: (context) => EventPage(eventInfo: eventInfo),
           ),
         )
       },
@@ -285,232 +285,59 @@ Widget buildEvent(BuildContext context, Event eventInfo, int index) {
   );
 }
 
-// ADD EVENT
-// calendar initialization
-CalendarFormat _calendarFormat = CalendarFormat.month;
-DateTime _selectedDay = DateTime.now();
-DateTime _focusedDay = DateTime.now();
-
-// this holds the "page" that will allow for creation of an event
-class AddEventPage extends StatefulWidget {
-  const AddEventPage({Key? key}) : super(key: key);
-
-  @override
-  AddEventContent createState() => AddEventContent();
-}
-
-class AddEventContent extends State<AddEventPage> {
-  // TEXT CONTROLLERS
-  // Name
-  TextEditingController nameController = TextEditingController(text: '');
-  // Description
-  TextEditingController descriptionController = TextEditingController(text: '');
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      appBar: AppBar(
-        title: const Text("Add Event"),
-        backgroundColor: const Color(0xFF212121),
-      ),
-      body: ListView(
-        shrinkWrap: true,
-        children: [
-          // SET DATE
-          Card(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(15),
-              ),
-              side: BorderSide(color: Color(0xff333333), width: 2.0),
-            ),
-            color: const Color(0xff121212),
-            margin:
-                const EdgeInsets.only(top: 15, bottom: 10, left: 15, right: 15),
-            // CALENDAR WIDGET
-            child: TableCalendar(
-              focusedDay: _focusedDay,
-              firstDay: DateTime(2021),
-              lastDay: DateTime(2023),
-              calendarFormat: _calendarFormat,
-              selectedDayPredicate: (day) {
-                // Use `selectedDayPredicate` to determine which day is currently selected.
-                // If this returns true, then `day` will be marked as selected.
-
-                // Using `isSameDay` is recommended to disregard
-                // the time-part of compared DateTime objects.
-                return isSameDay(_selectedDay, day);
-              },
-              onDaySelected: (selectedDay, focusedDay) {
-                if (!isSameDay(_selectedDay, selectedDay)) {
-                  // Call `setState()` when updating the selected day
-                  setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
-                  });
-                }
-              },
-              onFormatChanged: (format) {
-                if (_calendarFormat != format) {
-                  // Call `setState()` when updating calendar format
-                  setState(() {
-                    _calendarFormat = format;
-                  });
-                }
-              },
-              onPageChanged: (focusedDay) {
-                // No need to call `setState()` here
-                _focusedDay = focusedDay;
-              },
-              // Calendar Header Styling
-              headerStyle: const HeaderStyle(
-                titleTextStyle: TextStyle(color: Colors.white, fontSize: 20.0),
-                decoration: BoxDecoration(
-                    color: Color(0xff333333),
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10))),
-                formatButtonShowsNext: false,
-                formatButtonTextStyle:
-                    TextStyle(color: Colors.white, fontSize: 16.0),
-                formatButtonDecoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(15.0),
-                  ),
-                ),
-                leftChevronIcon: Icon(
-                  Icons.chevron_left,
-                  color: Colors.blue,
-                  size: 28,
-                ),
-                rightChevronIcon: Icon(
-                  Icons.chevron_right,
-                  color: Colors.blue,
-                  size: 28,
-                ),
-              ),
-              // Calendar Days Styling
-              daysOfWeekStyle: const DaysOfWeekStyle(
-                // Weekend days color (Sat,Sun)
-                weekendStyle: TextStyle(color: Color(0xff82B7FF)),
-              ),
-              // Calendar Dates styling
-              calendarStyle: CalendarStyle(
-                // Weekend dates color (Sat & Sun Column)
-                weekendTextStyle: const TextStyle(color: Color(0xff82B7FF)),
-                // highlighted color for today
-                // get rid of all decoration for the current day
-                todayDecoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.0),
-                ),
-                // highlighted color for selected day
-                selectedDecoration: const BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle,
-                ),
-                withinRangeTextStyle: const TextStyle(
-                  color: Colors.white,
-                ),
-                selectedTextStyle: const TextStyle(color: Colors.white),
-                defaultTextStyle: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-          // Contiains the "form section"
-          Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: Column(
-              children: [
-                // SET EVENT NAME
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: TextFormField(
-                    style: const TextStyle(color: Colors.white),
-                    controller: nameController,
-                    // set length
-                    maxLength: 30,
-                    decoration: const InputDecoration(
-                      labelText: 'Name*',
-                      prefixIcon: Icon(
-                        Icons.drive_file_rename_outline_rounded,
-                      ),
-                      counterStyle: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                // SET EVENT DESCRIPTION (might be nothing)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: TextFormField(
-                    style: const TextStyle(color: Colors.white),
-                    controller: descriptionController,
-                    decoration: const InputDecoration(
-                      labelText: 'Description',
-                      prefixIcon: Icon(Icons.short_text_rounded),
-                    ),
-                  ),
-                ),
-                // ADD BUTTON
-                // Acts as a "submit" button
-                TextButton(
-                  onPressed: () => {
-                    // Ensure Name Is Set
-                    if (nameController.text != "")
-                      {
-                        exitMenu(context),
-                        addEvent(
-                          nameController.text,
-                          _selectedDay,
-                          descriptionController.text,
-                        ),
-                      }
-                    else
-                      {
-                        // display error snackbar
-                        _changeEvent(context, nameController.text)
-                      }
-                  },
-                  child: const Text(
-                    "Add",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
+// EVENT ADD/EDIT PAGE
 // this holds the "page" that will allow for editing of an event
-class EditEventPage extends StatefulWidget {
-  EditEventPage(this.eventInfo, {Key? key}) : super(key: key);
-  final eventInfo;
+// if there is an event passed then editing is occuring else adding
+
+class EventPage extends StatefulWidget {
+  const EventPage({this.eventInfo, Key? key}) : super(key: key);
+  final Event? eventInfo;
 
   @override
-  EditEventContent createState() => EditEventContent(eventInfo);
+  // ignore: no_logic_in_create_state
+  EventContent createState() => EventContent(eventInfo);
 }
 
-class EditEventContent extends State<EditEventPage> {
-  final _eventInfo;
-  EditEventContent(this._eventInfo);
-
+class EventContent extends State<EventPage> {
+  // Calendar Initialization
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _selectedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
+  // Event
+  final Event? _eventInfo;
+  EventContent(this._eventInfo);
   // TEXT CONTROLLERS
   // Name
   TextEditingController nameController = TextEditingController(text: '');
   // Description
   TextEditingController descriptionController = TextEditingController(text: '');
 
+  // Varying Variables
+  String submitText = '';
+  String titleText = '';
+
+  @override
+  void initState() {
+    // If Editing
+    if (_eventInfo != null) {
+      nameController.text = _eventInfo!.name;
+      descriptionController.text = _eventInfo!.description;
+      submitText = 'Edit';
+      titleText = 'Edit Event';
+      // Else Adding
+    } else {
+      submitText = 'Add';
+      titleText = 'Add Event';
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        title: const Text("Edit Event"),
+        title: Text(titleText),
         backgroundColor: const Color(0xFF212121),
       ),
       body: ListView(
@@ -659,22 +486,35 @@ class EditEventContent extends State<EditEventPage> {
                     if (nameController.text != "")
                       {
                         exitMenu(context),
-                        editEvent(
-                          _eventInfo,
-                          nameController.text,
-                          _selectedDay,
-                          descriptionController.text,
-                        ),
+                        // If Editing
+                        if (_eventInfo != null)
+                          {
+                            editEvent(
+                              _eventInfo,
+                              nameController.text,
+                              _selectedDay,
+                              descriptionController.text,
+                            ),
+                          }
+                        // Else Adding
+                        else
+                          {
+                            addEvent(
+                              nameController.text,
+                              _selectedDay,
+                              descriptionController.text,
+                            ),
+                          },
                       }
                     else
                       {
                         // display error snackbar
-                        _changeEvent(context, nameController.text)
+                        _changeEvent(context)
                       }
                   },
-                  child: const Text(
-                    "Edit",
-                    style: TextStyle(fontSize: 16),
+                  child: Text(
+                    submitText,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ],
@@ -715,12 +555,12 @@ final eventEditController = TextEditingController(text: '');
 // EDIT EVENT
 // this makes the changes that are chosen in the _editEvent() method
 void editEvent(
-  Event eventInfo,
+  Event? eventInfo,
   String name,
   DateTime date,
   String description,
 ) {
-  eventInfo.name = name;
+  eventInfo!.name = name;
   eventInfo.date = date;
   eventInfo.description = description;
   // Update values of the existing event
@@ -734,7 +574,7 @@ void deleteEvent(Event eventInfo) {
 
 // ADD/EDIT EVENT SNACKBAR
 // this will be displayed when the add/edit event button is pressed
-_changeEvent(BuildContext context, String name) {
+_changeEvent(BuildContext context) {
   return ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: const Text(
