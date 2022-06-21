@@ -4,9 +4,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SocialPage extends StatelessWidget {
   // Web Container Variables
-  final _instagram = ['https://www.instagram.com/cchs165/?hl=en'];
-  final _twitter = ['https://mobile.twitter.com/cchs165'];
-  final _website = ['https://www.cchs165.jacksn.k12.il.us/'];
+  final links = [
+    'https://www.instagram.com/cchs165/?hl=en',
+    'https://mobile.twitter.com/cchs165',
+    'https://www.cchs165.jacksn.k12.il.us/'
+  ];
   final icons = [
     FontAwesomeIcons.instagram,
     FontAwesomeIcons.twitter,
@@ -26,21 +28,9 @@ class SocialPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               _topSection(),
-              Column(
-                children: _twitter
-                    .map((link) => webViewButton(context, link, 1))
-                    .toList(),
-              ),
-              Column(
-                children: _instagram
-                    .map((link) => webViewButton(context, link, 0))
-                    .toList(),
-              ),
-              Column(
-                children: _website
-                    .map((link) => webViewButton(context, link, 2))
-                    .toList(),
-              ),
+              webViewButton(context, 0),
+              webViewButton(context, 1),
+              webViewButton(context, 2)
             ],
           ),
         ),
@@ -49,7 +39,7 @@ class SocialPage extends StatelessWidget {
   }
 
 // WEBVIEW BUTTON
-  Widget webViewButton(BuildContext context, String url, int index) {
+  Widget webViewButton(BuildContext context, int index) {
     // Varying Variables
     dynamic faIcon;
     // If Not Instagram
@@ -61,7 +51,7 @@ class SocialPage extends StatelessWidget {
     } else {
       faIcon = const GradientIcon(
         FontAwesomeIcons.instagram,
-        40.0,
+        30.0,
         LinearGradient(
           colors: <Color>[
             Color(0xffF58529),
@@ -75,31 +65,41 @@ class SocialPage extends StatelessWidget {
       );
     }
 
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      color: const Color(0xff333333),
-      child: ListTile(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        leading: faIcon,
-        title: Text.rich(
-          TextSpan(
-            style: const TextStyle(
-              color: Colors.white,
+    return Column(
+      children: [
+        Card(
+          elevation: 0.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          color: const Color(0xff121212),
+          child: ListTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
             ),
-            children: [
+            leading: faIcon,
+            trailing:
+                const Icon(Icons.arrow_forward_rounded, color: Colors.white),
+            title: Text.rich(
               TextSpan(
-                text: text[index],
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
+                children: [
+                  TextSpan(
+                    text: text[index],
+                  ),
+                ],
               ),
-            ],
+            ),
+            // Bring the user to the desired link
+            onTap: () => _handleURLButtonPress(context, links[index], index),
           ),
         ),
-        // Bring the user to the desired link
-        onTap: () => _handleURLButtonPress(context, url, index),
-      ),
+        Divider(
+          color: Colors.grey.shade700,
+        ),
+      ],
     );
   }
 
