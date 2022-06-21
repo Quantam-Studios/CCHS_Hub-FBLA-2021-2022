@@ -43,6 +43,21 @@ class ClassPageContent extends State {
     return Scaffold(
       drawerEnableOpenDragGesture: false,
       backgroundColor: const Color(0xFF121212),
+      floatingActionButton: FloatingActionButton(
+        // ADD EVENT
+        onPressed: () => {
+          // ensure that no more than 7 classes can be added.
+          if (Boxes.getClasses().length < 7)
+            // if < 7 then allow for a new class to be made
+            {_addClass(context)}
+          else
+            // if there are already 7 classes then tell the user
+            {
+              _tooManyClasses(context),
+            },
+        },
+        child: const Icon(Icons.add),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -66,7 +81,7 @@ class ClassPageContent extends State {
 }
 
 // TOP SECTION
-// this has the title of the age as well as the buttons to add and clear classes
+// this has the title of the page as well as the buttons to add and clear classes
 _topSection(BuildContext context) {
   return Container(
     decoration: BoxDecoration(
@@ -104,24 +119,6 @@ _topSection(BuildContext context) {
               Boxes.getClasses().compact(),
             },
           ),
-          // Add Button
-          TextButton(
-            child: const Text(
-              "Add",
-              style: TextStyle(fontSize: 18),
-            ),
-            onPressed: () => {
-              // ensure that no more than 7 classes can be added.
-              if (Boxes.getClasses().length < 7)
-                // if < 7 then allow for a new class to be made
-                {_addClass(context)}
-              else
-                // if there are already 7 classes then tell the user
-                {
-                  _tooManyClasses(context),
-                }
-            },
-          ),
         ],
         crossAxisAlignment: CrossAxisAlignment.center,
       ),
@@ -148,7 +145,7 @@ Widget buildClasses(List<Class> allClasses) {
           const Text.rich(
             TextSpan(children: <TextSpan>[
               TextSpan(text: "Press "),
-              TextSpan(text: "add", style: TextStyle(color: Colors.blue)),
+              TextSpan(text: "+", style: TextStyle(color: Colors.blue)),
               TextSpan(text: " to add a class.")
             ]),
             style: TextStyle(color: Colors.grey, fontSize: 18),

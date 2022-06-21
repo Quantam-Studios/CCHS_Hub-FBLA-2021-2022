@@ -529,9 +529,9 @@ updateActiveClass() {
     int timeStat = activeTimeUpdateCheck(endOfDay);
     if (timeStat <= 0) {
       // if it is determine the active class
-      for (int i = 1; activeClass < i + 1; i++) {
+      for (int i = 0; activeClass <= i; i++) {
         int status = activeTimeUpdateCheck(checkTimes[activeClass]);
-        if (status == 1 && activeClass != 6) {
+        if (status == 1 && activeClass != 6 - offset) {
           activeClass += 1;
         } else {
           print(activeClass);
@@ -798,5 +798,12 @@ _lunchForTheDay() {
         ),
       ],
     ),
+  );
+}
+
+// PLANS FOR THE DAY SECTION
+_plansForTheDay() {
+  return ListView(
+    shrinkWrap: true,
   );
 }

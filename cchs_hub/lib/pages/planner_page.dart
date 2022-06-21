@@ -32,7 +32,7 @@ class PlannerPageContent extends State<PlannerPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => EventPage(),
+              builder: (context) => const EventPage(),
             ),
           )
         },
@@ -114,7 +114,8 @@ Widget buildEvents(List<Event> allEvents) {
   // Check if any events exist
   if (allEvents.isEmpty) {
     // if not then tell the user
-    return Center(
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
       child: Column(
         children: [
           const Text.rich(
@@ -155,15 +156,31 @@ Widget buildEvents(List<Event> allEvents) {
 Widget buildEvent(BuildContext context, Event eventInfo, int index) {
   // Determine Time Format
   String finalTimeString = eventInfo.date.toIso8601String().substring(0, 10);
-
-  // Event Card
   Widget event;
   // Buttons
   _starButton() {
+    IconData icon = Icons.star_outline_rounded;
+    if (eventInfo.marked) {
+      icon = Icons.star_rounded;
+    }
+
     return IconButton(
-      onPressed: () => {},
-      icon: const Icon(
-        Icons.star_border_rounded,
+      onPressed: () => {
+        // toggle marked bool
+        if (eventInfo.marked)
+          {
+            eventInfo.marked = false,
+            icon = Icons.star_outline_rounded,
+          }
+        else
+          {
+            eventInfo.marked = true,
+            icon = Icons.star_rounded,
+          },
+        eventInfo.save(),
+      },
+      icon: Icon(
+        icon,
         color: Colors.white,
       ),
     );

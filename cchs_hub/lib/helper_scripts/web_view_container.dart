@@ -6,10 +6,11 @@ class WebViewContainer extends StatefulWidget {
   final index;
   const WebViewContainer(this.url, this.index);
   @override
+  // ignore: no_logic_in_create_state
   createState() => _WebViewContainerState(url, index);
 }
 
-final socialStrings = ['CCHS Instagram', 'CCHS Twitter'];
+final socialStrings = ['CCHS Instagram', 'CCHS Twitter', 'CCHS Website'];
 
 class _WebViewContainerState extends State<WebViewContainer> {
   final _url;

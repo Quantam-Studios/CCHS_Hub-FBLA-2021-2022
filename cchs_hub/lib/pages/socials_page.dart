@@ -4,7 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SocialPage extends StatelessWidget {
   final _instagram = ['https://www.instagram.com/cchs165/?hl=en'];
-  final _twitter = ['https://twitter.com/cchs165'];
+  final _twitter = ['https://mobile.twitter.com/cchs165'];
+  final _website = ['https://www.cchs165.jacksn.k12.il.us/'];
 
   SocialPage({Key? key}) : super(key: key);
   @override
@@ -13,22 +14,23 @@ class SocialPage extends StatelessWidget {
       backgroundColor: const Color(0xFF121212),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(5.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              _topSection(),
               Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: _twitter
                     .map((link) => _twitterButton(context, link))
                     .toList(),
               ),
               Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: _instagram
                     .map((link) => _instagramButton(context, link))
+                    .toList(),
+              ),
+              Column(
+                children: _website
+                    .map((link) => _websiteButton(context, link))
                     .toList(),
               ),
             ],
@@ -42,13 +44,12 @@ class SocialPage extends StatelessWidget {
 // widget for the instagram button
   Widget _instagramButton(BuildContext context, String url) {
     int index = 0;
-    return Center(
-      heightFactor: 2,
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        color: const Color(0xff333333),
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      color: const Color(0xff333333),
+      child: Center(
         child: ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
@@ -74,7 +75,7 @@ class SocialPage extends StatelessWidget {
               ),
               children: [
                 TextSpan(
-                  text: 'View the CCHS Instagram',
+                  text: 'View the Instagram',
                 ),
               ],
             ),
@@ -89,36 +90,68 @@ class SocialPage extends StatelessWidget {
 // widget for the twitter button
   Widget _twitterButton(BuildContext context, String url) {
     int index = 1;
-    return Center(
-      heightFactor: 2,
-      child: Card(
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      color: const Color(0xff333333),
+      child: ListTile(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
-        color: const Color(0xff333333),
-        child: ListTile(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          leading: const FaIcon(
-            FontAwesomeIcons.twitter,
-            color: Colors.blue,
-          ),
-          title: const Text.rich(
-            TextSpan(
-              style: TextStyle(
-                color: Colors.white,
-              ),
-              children: [
-                TextSpan(
-                  text: 'View the CCHS Twitter',
-                ),
-              ],
-            ),
-          ),
-          // Bring the user to the desired link
-          onTap: () => _handleURLButtonPress(context, url, index),
+        leading: const FaIcon(
+          FontAwesomeIcons.twitter,
+          color: Colors.blue,
         ),
+        title: const Text.rich(
+          TextSpan(
+            style: TextStyle(
+              color: Colors.white,
+            ),
+            children: [
+              TextSpan(
+                text: 'View the Twitter',
+              ),
+            ],
+          ),
+        ),
+        // Bring the user to the desired link
+        onTap: () => _handleURLButtonPress(context, url, index),
+      ),
+    );
+  }
+
+  // TWITTER BUTTON
+// widget for the twitter button
+  Widget _websiteButton(BuildContext context, String url) {
+    int index = 2;
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      color: const Color(0xff333333),
+      child: ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        leading: const FaIcon(
+          FontAwesomeIcons.school,
+          color: Colors.white,
+        ),
+        title: const Text.rich(
+          TextSpan(
+            style: TextStyle(
+              color: Colors.white,
+            ),
+            children: [
+              TextSpan(
+                text: 'View the website',
+              ),
+            ],
+          ),
+        ),
+        // Bring the user to the desired link
+        onTap: () => _handleURLButtonPress(context, url, index),
       ),
     );
   }
@@ -162,4 +195,34 @@ class GradientIcon extends StatelessWidget {
       },
     );
   }
+}
+
+// TOP SECTION
+// this has the title of the page
+_topSection() {
+  return Container(
+    decoration: BoxDecoration(
+      color: const Color(0xFF222222),
+      boxShadow: [
+        BoxShadow(
+            color: Colors.black.withOpacity(0.5),
+            spreadRadius: 1,
+            blurRadius: 10),
+      ],
+    ),
+    child: Row(
+      children: const [
+        Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 10.0,
+            horizontal: 10.0,
+          ),
+          child: Text(
+            "CCHS Socials",
+            style: TextStyle(fontSize: 23),
+          ),
+        ),
+      ],
+    ),
+  );
 }
