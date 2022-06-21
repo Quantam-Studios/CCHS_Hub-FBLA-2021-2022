@@ -83,16 +83,6 @@ _topSection(BuildContext context) {
           ),
           // Separation
           const Spacer(),
-          // Delete all
-          TextButton(
-            style: TextButton.styleFrom(primary: Colors.redAccent),
-            child: const Text(
-              "Clear",
-              style: TextStyle(fontSize: 18),
-            ),
-            onPressed: () =>
-                {Boxes.getEvents().clear(), Boxes.getEvents().compact()},
-          ),
           // Sort By Button
           TextButton(
             child: const Text(

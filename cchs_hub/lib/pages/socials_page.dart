@@ -96,8 +96,11 @@ class SocialPage extends StatelessWidget {
             onTap: () => _handleURLButtonPress(context, links[index], index),
           ),
         ),
-        Divider(
-          color: Colors.grey.shade700,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Divider(
+            color: Colors.grey.shade700,
+          ),
         ),
       ],
     );
