@@ -3,9 +3,17 @@ import 'package:cchs_hub/helper_scripts/web_view_container.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SocialPage extends StatelessWidget {
+  // Web Container Variables
   final _instagram = ['https://www.instagram.com/cchs165/?hl=en'];
   final _twitter = ['https://mobile.twitter.com/cchs165'];
   final _website = ['https://www.cchs165.jacksn.k12.il.us/'];
+  final icons = [
+    FontAwesomeIcons.instagram,
+    FontAwesomeIcons.twitter,
+    FontAwesomeIcons.school
+  ];
+  final colors = [Colors.white, Colors.blue, Colors.white];
+  final text = ['View the Instagram', 'View the Twitter', 'View the website'];
 
   SocialPage({Key? key}) : super(key: key);
   @override
@@ -20,17 +28,17 @@ class SocialPage extends StatelessWidget {
               _topSection(),
               Column(
                 children: _twitter
-                    .map((link) => _twitterButton(context, link))
+                    .map((link) => webViewButton(context, link, 1))
                     .toList(),
               ),
               Column(
                 children: _instagram
-                    .map((link) => _instagramButton(context, link))
+                    .map((link) => webViewButton(context, link, 0))
                     .toList(),
               ),
               Column(
                 children: _website
-                    .map((link) => _websiteButton(context, link))
+                    .map((link) => webViewButton(context, link, 2))
                     .toList(),
               ),
             ],
@@ -40,56 +48,33 @@ class SocialPage extends StatelessWidget {
     );
   }
 
-// INSTAGRAM BUTTON
-// widget for the instagram button
-  Widget _instagramButton(BuildContext context, String url) {
-    int index = 0;
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      color: const Color(0xff333333),
-      child: Center(
-        child: ListTile(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          leading: const GradientIcon(
-            FontAwesomeIcons.instagram,
-            40.0,
-            LinearGradient(
-              colors: <Color>[
-                Color(0xffF58529),
-                Color(0xffDD2A7B),
-                Color(0xff8134AF),
-                Color(0xff515BD4),
-              ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
-          ),
-          title: const Text.rich(
-            TextSpan(
-              style: TextStyle(
-                color: Colors.white,
-              ),
-              children: [
-                TextSpan(
-                  text: 'View the Instagram',
-                ),
-              ],
-            ),
-          ),
-          onTap: () => _handleURLButtonPress(context, url, index),
+// WEBVIEW BUTTON
+  Widget webViewButton(BuildContext context, String url, int index) {
+    // Varying Variables
+    dynamic faIcon;
+    // If Not Instagram
+    if (index != 0) {
+      faIcon = FaIcon(
+        icons[index],
+        color: colors[index],
+      );
+    } else {
+      faIcon = const GradientIcon(
+        FontAwesomeIcons.instagram,
+        40.0,
+        LinearGradient(
+          colors: <Color>[
+            Color(0xffF58529),
+            Color(0xffDD2A7B),
+            Color(0xff8134AF),
+            Color(0xff515BD4),
+          ],
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
         ),
-      ),
-    );
-  }
+      );
+    }
 
-// TWITTER BUTTON
-// widget for the twitter button
-  Widget _twitterButton(BuildContext context, String url) {
-    int index = 1;
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -99,53 +84,15 @@ class SocialPage extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
-        leading: const FaIcon(
-          FontAwesomeIcons.twitter,
-          color: Colors.blue,
-        ),
-        title: const Text.rich(
+        leading: faIcon,
+        title: Text.rich(
           TextSpan(
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
             ),
             children: [
               TextSpan(
-                text: 'View the Twitter',
-              ),
-            ],
-          ),
-        ),
-        // Bring the user to the desired link
-        onTap: () => _handleURLButtonPress(context, url, index),
-      ),
-    );
-  }
-
-  // TWITTER BUTTON
-// widget for the twitter button
-  Widget _websiteButton(BuildContext context, String url) {
-    int index = 2;
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      color: const Color(0xff333333),
-      child: ListTile(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        leading: const FaIcon(
-          FontAwesomeIcons.school,
-          color: Colors.white,
-        ),
-        title: const Text.rich(
-          TextSpan(
-            style: TextStyle(
-              color: Colors.white,
-            ),
-            children: [
-              TextSpan(
-                text: 'View the website',
+                text: text[index],
               ),
             ],
           ),
