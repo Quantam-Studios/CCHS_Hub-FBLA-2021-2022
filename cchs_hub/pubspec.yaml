@@ -49,10 +49,11 @@ dependencies:
   # expansion card for events.
   expansion_tile_card: ^2.0.0
   
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # icons
+  flutter_launcher_icons: "^0.9.2"
 
   # hive data base generators
   build_runner: 
@@ -64,6 +65,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
+
+# App icon stuff  
+flutter_icons:
+  image_path: "assets/chubicon.png"
+  android: true
+  ios: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

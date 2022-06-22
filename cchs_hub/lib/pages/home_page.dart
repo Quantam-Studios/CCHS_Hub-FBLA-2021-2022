@@ -1,7 +1,9 @@
 // General Packages
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:cchs_hub/pages/classes_page.dart';
+// Pages
+import 'classes_page.dart';
+import 'planner_page.dart';
 // Popups
 import 'package:rflutter_alert/rflutter_alert.dart';
 // Time Management
@@ -11,6 +13,7 @@ import 'dart:io';
 // Models
 import 'package:cchs_hub/model/user.dart';
 import 'package:cchs_hub/model/class.dart';
+import 'package:cchs_hub/model/event.dart';
 // Hive DataBase
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:cchs_hub/helper_scripts/boxes.dart';
@@ -554,8 +557,8 @@ Class currentClass = Class();
 _currentClassInfo() {
   return Container(
     margin: const EdgeInsets.only(
-      right: 15.0,
-      left: 15.0,
+      right: 10.0,
+      left: 10.0,
       top: 15.0,
     ),
     padding: const EdgeInsets.all(10.0),
@@ -741,22 +744,103 @@ _mainSection() {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: ListView(
+        shrinkWrap: true,
         children: [
           _currentClassInfo(),
           _lunchForTheDay(),
+          ValueListenableBuilder<Box<Event>>(
+            valueListenable: Boxes.getEvents().listenable(),
+            builder: (context, box, _) {
+              final newEvents = box.values.toList().cast<Event>();
+              return buildEvents(newEvents);
+            },
+          ),
         ],
       ),
     ),
   );
 }
 
+// BUILD EVENTS
+// Contruction of the event list happens here
+Widget buildEvents(List<Event> allEvents) {
+  // Check if any events exist
+  if (!plansToday(allEvents)) {
+    // if not then tell the user
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Column(
+        children: [
+          const Text("You have no plans today.",
+              style: TextStyle(color: Colors.grey, fontSize: 18)),
+          Divider(
+            color: Colors.grey.shade700,
+          ),
+        ],
+      ),
+    );
+  } else {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(13.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Your Plans For The Day",
+                style: TextStyle(fontSize: 21),
+              ),
+              Divider(
+                color: Colors.grey.shade700,
+              ),
+            ],
+          ),
+        ),
+        // this dynamically creates a new card (ListTile) for each event
+        ListView.builder(
+          padding: const EdgeInsets.all(10.0),
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: allEvents.length,
+          itemBuilder: (BuildContext context, int index) {
+            if (allEvents[index].date.day == DateTime.now().day) {
+              final newEvent = allEvents[index];
+              return buildEvent(context, newEvent, index);
+            } else {
+              return Container();
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
+
+// PLANS TODAY
+// returns false is there are no plans for the day
+// returns true if there are plans for the day
+bool plansToday(List<Event> allEvents) {
+  if (Boxes.getEvents().isEmpty) {
+    return false;
+  } else {
+    // Check if any events are relevant for the day
+    for (int i = 0; i < allEvents.length; i++) {
+      if (allEvents[i].date.day == DateTime.now().day) {
+        // plans were ofund for the day
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 // LUNCH FOR THE CURRENT DAY CONTAINER
 _lunchForTheDay() {
   return Container(
     margin:
-        const EdgeInsets.only(top: 20.0, bottom: 0, left: 15.0, right: 15.0),
+        const EdgeInsets.only(top: 15.0, bottom: 0, left: 10.0, right: 10.0),
     padding: const EdgeInsets.all(10.0),
     decoration: BoxDecoration(
       color: const Color(0xFF333333),
@@ -788,22 +872,19 @@ _lunchForTheDay() {
         // LUNCH ITEMS
         const Padding(
           padding: EdgeInsets.all(8.0),
-          child: Text(
-            "Pizza, fruit cup, breadsticks, milk",
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Pizza, fruit cup, breadsticks, milk",
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.left,
             ),
           ),
         ),
       ],
     ),
-  );
-}
-
-// PLANS FOR THE DAY SECTION
-_plansForTheDay() {
-  return ListView(
-    shrinkWrap: true,
   );
 }
