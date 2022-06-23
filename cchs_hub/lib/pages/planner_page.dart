@@ -1,5 +1,6 @@
 // General
-import 'package:cchs_hub/helper_scripts/time_management.dart';
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:flutter/material.dart';
 // Calendar
 import 'package:table_calendar/table_calendar.dart';

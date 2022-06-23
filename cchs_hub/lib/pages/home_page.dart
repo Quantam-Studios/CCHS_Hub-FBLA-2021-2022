@@ -537,16 +537,13 @@ updateActiveClass() {
         if (status == 1 && activeClass != 6 - offset) {
           activeClass += 1;
         } else {
-          print(activeClass);
           break;
         }
       }
     }
   } else {
-    print("VALUES NULL");
     return;
   }
-  print(activeClass);
 }
 
 // this contains the class object that will hold the active class info
