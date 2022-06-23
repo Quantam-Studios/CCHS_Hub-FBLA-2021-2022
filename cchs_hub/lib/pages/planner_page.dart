@@ -1,4 +1,5 @@
 // General
+import 'package:cchs_hub/helper_scripts/time_management.dart';
 import 'package:flutter/material.dart';
 // Calendar
 import 'package:table_calendar/table_calendar.dart';
@@ -39,7 +40,7 @@ class PlannerPageContent extends State<PlannerPage> {
         child: ListView(
           shrinkWrap: true,
           children: [
-            _topSection(context),
+            _topSection(context, this),
             ValueListenableBuilder<Box<Event>>(
               valueListenable: Boxes.getEvents().listenable(),
               builder: (context, box, _) {
@@ -55,7 +56,8 @@ class PlannerPageContent extends State<PlannerPage> {
 }
 
 // TOP SECTION
-_topSection(BuildContext context) {
+String dropdownValue = 'All';
+_topSection(BuildContext context, PlannerPageContent content) {
   return Container(
     decoration: BoxDecoration(
       color: const Color(0xFF222222),
@@ -81,18 +83,36 @@ _topSection(BuildContext context) {
           // Separation
           const Spacer(),
           // Sort By Button
-          TextButton(
-            child: const Text(
-              "Sort By",
-              style: TextStyle(fontSize: 18),
-            ),
-            onPressed: () => {},
+          DropdownButton(
+            style: const TextStyle(color: Colors.blue, fontSize: 18),
+            iconEnabledColor: Colors.blue,
+            dropdownColor: const Color(0xFF212121),
+            value: dropdownValue,
+            items: dropdownItems(),
+            underline: Container(),
+            onChanged: (String? newValue) {
+              content.setState(() {
+                dropdownValue = newValue!;
+              });
+            },
           ),
         ],
         crossAxisAlignment: CrossAxisAlignment.center,
       ),
     ),
   );
+}
+
+// Drop Down Items For Sort By Button
+dropdownItems() {
+  List items = <String>['All', 'Starred', 'Past', 'Future']
+      .map<DropdownMenuItem<String>>((String value) {
+    return DropdownMenuItem<String>(
+      value: value,
+      child: Text(value, style: const TextStyle(color: Colors.white)),
+    );
+  }).toList();
+  return items;
 }
 
 // BUILD EVENTS
@@ -130,7 +150,22 @@ Widget buildEvents(List<Event> allEvents) {
           itemCount: allEvents.length,
           itemBuilder: (BuildContext context, int index) {
             final newEvent = allEvents[index];
-            return buildEvent(context, newEvent, index);
+            // If All is selected.
+            if (dropdownValue == "All") {
+              return buildEvent(context, newEvent, index);
+              // If Starred is selected.
+            } else if (dropdownValue == "Starred" && newEvent.marked == true) {
+              return buildEvent(context, newEvent, index);
+              // If Past is selected.
+            } else if (dropdownValue == "Past" &&
+                newEvent.date.day < DateTime.now().day) {
+              return buildEvent(context, newEvent, index);
+              // If Future is selected.
+            } else if (dropdownValue == "Future" &&
+                newEvent.date.day > DateTime.now().day) {
+              return buildEvent(context, newEvent, index);
+            }
+            return Container();
           },
         ),
       ],

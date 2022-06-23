@@ -532,7 +532,7 @@ updateActiveClass() {
     int timeStat = activeTimeUpdateCheck(endOfDay);
     if (timeStat <= 0) {
       // if it is determine the active class
-      for (int i = offset; i < allClasses.length; i++) {
+      for (int i = offset; i < checkTimes.length; i++) {
         int status = activeTimeUpdateCheck(checkTimes[i]);
         if (status == 1 && activeClass != 6 - offset) {
           activeClass += 1;
