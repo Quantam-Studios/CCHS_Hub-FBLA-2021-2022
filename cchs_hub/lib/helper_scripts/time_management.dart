@@ -53,8 +53,8 @@ final List<String> greetingStrings = [
   'Good Evening',
 ];
 
-// CLASS TIME CHECK VALUES
-// this holds all class times as TimeOfDay values
+// GREETING TIME VALUES
+// this holds all greeting times as TimeOfDay values
 final List<TimeOfDay> greetingTimes = [
   // Morning
   const TimeOfDay(hour: 0, minute: 0),

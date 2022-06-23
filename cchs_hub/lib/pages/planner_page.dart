@@ -1,12 +1,9 @@
 // General
 import 'package:flutter/material.dart';
-import "package:flutter/services.dart";
 // Calendar
 import 'package:table_calendar/table_calendar.dart';
 // Display of Events
 import 'package:expansion_tile_card/expansion_tile_card.dart';
-// Popups
-import 'package:rflutter_alert/rflutter_alert.dart';
 // Events
 import '/model/event.dart';
 // Hive DataBase

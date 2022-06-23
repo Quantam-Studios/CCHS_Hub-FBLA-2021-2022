@@ -1,5 +1,4 @@
 // General Packages
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 // Pages
 import 'classes_page.dart';
@@ -521,6 +520,7 @@ Future _ideaSent(BuildContext context) async {
 int activeClass = 0;
 // this is the "global" reference allowing for other functions to see the active class
 List<dynamic> allClasses = [];
+
 // Compare times, and update active class if needed
 updateActiveClass() {
   allClasses = Boxes.getClasses().values.toList().cast();
@@ -532,8 +532,8 @@ updateActiveClass() {
     int timeStat = activeTimeUpdateCheck(endOfDay);
     if (timeStat <= 0) {
       // if it is determine the active class
-      for (int i = 0; activeClass <= i; i++) {
-        int status = activeTimeUpdateCheck(checkTimes[activeClass]);
+      for (int i = offset; i < allClasses.length; i++) {
+        int status = activeTimeUpdateCheck(checkTimes[i]);
         if (status == 1 && activeClass != 6 - offset) {
           activeClass += 1;
         } else {
@@ -875,7 +875,7 @@ _lunchForTheDay() {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              "Pizza, fruit cup, breadsticks, milk",
+              "BBQ chicken, chips, steamed broccoli, fruit, and milk.",
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.grey,
